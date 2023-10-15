@@ -1,17 +1,18 @@
 package com.ilanherbach.javaspringboottodo.task;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.security.auth.message.callback.PrivateKeyCallback.IssuerSerialNumRequest;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -45,10 +46,18 @@ public class TaskController {
     }
 
     // get userId and create a task
-    Object IdUser = request.getAttribute("idUser");
-    taskModel.setIdUser((UUID) IdUser);
+    Object idUser = request.getAttribute("idUser");
+    taskModel.setIdUser((UUID) idUser);
     var task = this.taskRepository.save(taskModel);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(task);
+  }
+
+  @GetMapping()
+  public ResponseEntity list(HttpServletRequest request) {
+    Object idUser = request.getAttribute("idUser");
+    List<TaskModel> userTasks = this.taskRepository.findByIdUser((UUID) idUser);
+
+    return ResponseEntity.status(HttpStatus.OK).body(userTasks);
   }
 }
